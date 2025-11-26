@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -91,13 +92,10 @@ public final class LambdaUtilities {
             final Set<T> newSet = new HashSet<>();
             newSet.add(t);
 
-            if (m.containsKey(key)) {
-                m.get(key).addAll(newSet);
-            } else {
-                m.put(key, newSet);
-            }
-
-            //m.merge(key, new HashSet<>(Set.of(t)));
+            m.merge(key, new HashSet<>(Set.of(t)), (set1, set2) -> {
+                set1.addAll(set2);
+                return set1;
+            });
         });
 
         return m;
