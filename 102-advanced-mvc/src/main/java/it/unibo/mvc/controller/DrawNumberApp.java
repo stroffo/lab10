@@ -7,18 +7,13 @@ import java.util.List;
 import it.unibo.mvc.DrawResult;
 import it.unibo.mvc.model.DrawNumber;
 import it.unibo.mvc.model.DrawNumberImpl;
+import it.unibo.mvc.util.ConfigurationManager;
 import it.unibo.mvc.view.DrawNumberView;
 import it.unibo.mvc.view.DrawNumberViewImpl;
-
-import it.unibo.mvc.Configuration;
 
 /**
  */
 public final class DrawNumberApp implements DrawNumberViewObserver {
-    private static final int MIN = 1000;
-    private static final int MAX = 100;
-    private static final int ATTEMPTS = 10;
-
     private final DrawNumber model;
     private final List<DrawNumberView> views;
 
@@ -36,11 +31,7 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
             view.start();
         }
 
-        Configuration config = new Configuration.Builder()
-            .setMax(MAX)
-            .setMin(MIN)
-            .setAttempts(ATTEMPTS)
-            .build();
+        var config = ConfigurationManager.getConfigFromFile();
 
         if (!config.isConsistent()) {
             for (final DrawNumberView view: views) {
