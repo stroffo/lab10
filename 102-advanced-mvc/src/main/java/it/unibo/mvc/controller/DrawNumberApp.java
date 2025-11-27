@@ -10,10 +10,12 @@ import it.unibo.mvc.model.DrawNumberImpl;
 import it.unibo.mvc.view.DrawNumberView;
 import it.unibo.mvc.view.DrawNumberViewImpl;
 
+import it.unibo.mvc.Configuration;
+
 /**
  */
 public final class DrawNumberApp implements DrawNumberViewObserver {
-    private static final int MIN = 0;
+    private static final int MIN = 1000;
     private static final int MAX = 100;
     private static final int ATTEMPTS = 10;
 
@@ -33,7 +35,25 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
             view.setObserver(this);
             view.start();
         }
-        this.model = new DrawNumberImpl(MIN, MAX, ATTEMPTS);
+
+        Configuration config = new Configuration.Builder()
+            .setMax(MAX)
+            .setMin(MIN)
+            .setAttempts(ATTEMPTS)
+            .build();
+
+        if (!config.isConsistent()) {
+            for (final DrawNumberView view: views) {
+                view.displayError("Invalid configuration! Exiting...");
+                this.quit();
+            }
+        }
+
+        this.model = new DrawNumberImpl(
+            config.getMin(), 
+            config.getMax(), 
+            config.getAttempts()
+        );
     }
 
     @Override
