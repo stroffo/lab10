@@ -52,7 +52,7 @@ public final class DrawNumberViewImpl implements DrawNumberView {
                 try {
                     observer.newAttempt(Integer.parseInt(tNumber.getText()));
                 } catch (NumberFormatException exception) {
-                    JOptionPane.showMessageDialog(frame, "An integer please..");
+                    displayError("An integer please..");
                 }
             }
         });
@@ -115,6 +115,11 @@ public final class DrawNumberViewImpl implements DrawNumberView {
             throw new IllegalStateException("Unexpected result: " + res);
         }
         observer.resetGame();
+    }
+
+    @Override
+    public void displayError(final String message) {
+        JOptionPane.showMessageDialog(frame, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     private void plainMessage(final String msg) {
