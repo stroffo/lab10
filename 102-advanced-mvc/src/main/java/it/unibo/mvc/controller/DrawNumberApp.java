@@ -104,7 +104,16 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
     public static void main(final String... args) throws FileNotFoundException {
         new DrawNumberApp(
             new DrawNumberViewImpl(), 
-            new PrintStreamView(System.out)
+            new PrintStreamView(System.out),
+            new PrintStreamView(
+                // Points to home folder ... /draw_number_app.log
+                System.getProperty("user.home")
+                + System.getProperty("file.separator")
+                + DrawNumberApp.class.getSimpleName()
+                    .replaceAll("([a-z])([A-Z])", "$1_$2")
+                    .toLowerCase()
+                + ".log"
+            )
         );
     }
 }
