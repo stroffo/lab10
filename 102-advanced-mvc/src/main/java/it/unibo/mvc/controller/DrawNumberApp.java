@@ -16,6 +16,7 @@ import it.unibo.mvc.view.DrawNumberViewImpl;
 public final class DrawNumberApp implements DrawNumberViewObserver {
     private final DrawNumber model;
     private final List<DrawNumberView> views;
+    private final ConfigurationManager configMgr;
 
     /**
      * @param views
@@ -25,13 +26,30 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
         /*
          * Side-effect proof
          */
+        configMgr = new ConfigurationManager();
+
         this.views = Arrays.asList(Arrays.copyOf(views, views.length));
         for (final DrawNumberView view: views) {
             view.setObserver(this);
             view.start();
         }
+    
+        try {
+            configMgr.loadConfiguration();
+        } catch (final Exception e) {
+            for (final DrawNumberView view: views) {
+                view.displayError(e.getMessage());
+                this.quit();
+            }
+        }
 
-        var config = ConfigurationManager.getConfigFromFile();
+        var config = configMgr.getloadedConfiguration();
+        if (config == null) {
+            for (final DrawNumberView view: views) {
+                view.displayError("Configuration could not be loaded correctly...");
+                this.quit();
+            }
+        }
 
         if (!config.isConsistent()) {
             for (final DrawNumberView view: views) {
@@ -85,5 +103,4 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
     public static void main(final String... args) throws FileNotFoundException {
         new DrawNumberApp(new DrawNumberViewImpl());
     }
-
 }

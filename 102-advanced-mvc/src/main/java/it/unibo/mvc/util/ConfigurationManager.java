@@ -1,24 +1,31 @@
 package it.unibo.mvc.util;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class ConfigurationManager {
     private static final String delim = ":";
+    private static final String defaultConf = "config.yml";
 
-    public static Configuration getConfigFromFile() {
-        return getConfigFromFile("config.yml");
+    private Configuration loadedConfiguration;
+
+    public void loadConfiguration() throws Exception {
+        loadConfiguration(defaultConf);
     }
 
-    public static Configuration getConfigFromFile(final String resourcePath) {
-        final var confBuilder = new Configuration.Builder();
+    public void loadConfiguration(final String resourcePath) throws Exception {
+        final InputStream in = ClassLoader.getSystemResourceAsStream(resourcePath);
+        if (in == null) {
+            throw new IOException("Couldn't find config file: " + resourcePath);
+        }
 
+        final var confBuilder = new Configuration.Builder();
         try (
-            final InputStream in = ClassLoader.getSystemResourceAsStream(resourcePath);
             final BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        ) { 
+        ) {
             StringTokenizer tkn = new StringTokenizer(br.readLine(), delim);
             if (tkn.nextToken().equals("minimum")) {
                 confBuilder.setMin(Integer.parseInt(tkn.nextToken().trim()));
@@ -33,12 +40,20 @@ public class ConfigurationManager {
             if (tkn.nextToken().equals("attempts")) {
                 confBuilder.setAttempts(Integer.parseInt(tkn.nextToken().trim()));
             }
-            
+        } catch (final Exception e) {
+            throw e;
+        } finally {
             in.close();
-        } catch (Exception e) {
-            // Yet to find a way to properly handle exceptions...
         }
+        
+        loadedConfiguration = confBuilder.build();
+    }
 
-        return confBuilder.build();
+    /**
+     * 
+     * @return the loaded coniguration; <code>null</code> if the configuration has not been loaded
+     */
+    public Configuration getloadedConfiguration() {
+        return loadedConfiguration;
     }
 }
