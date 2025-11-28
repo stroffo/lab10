@@ -10,6 +10,7 @@ import it.unibo.mvc.model.DrawNumberImpl;
 import it.unibo.mvc.util.ConfigurationManager;
 import it.unibo.mvc.view.DrawNumberView;
 import it.unibo.mvc.view.DrawNumberViewImpl;
+import it.unibo.mvc.view.PrintStreamView;
 
 /**
  */
@@ -38,24 +39,24 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
             configMgr.loadConfiguration();
         } catch (final Exception e) {
             for (final DrawNumberView view: views) {
-                view.displayError(e.getMessage());
-                this.quit();
+                view.displayError("Error loading config " + e.getMessage() + ". Exiting...");
             }
+            this.quit();
         }
 
         var config = configMgr.getloadedConfiguration();
         if (config == null) {
             for (final DrawNumberView view: views) {
-                view.displayError("Configuration could not be loaded correctly...");
-                this.quit();
+                view.displayError("Could not get loaded configuration. Exiting...");
             }
+            this.quit();
         }
 
         if (!config.isConsistent()) {
             for (final DrawNumberView view: views) {
                 view.displayError("Invalid configuration! Exiting...");
-                this.quit();
             }
+            this.quit();
         }
 
         this.model = new DrawNumberImpl(
@@ -101,6 +102,9 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
      * @throws FileNotFoundException 
      */
     public static void main(final String... args) throws FileNotFoundException {
-        new DrawNumberApp(new DrawNumberViewImpl());
+        new DrawNumberApp(
+            new DrawNumberViewImpl(), 
+            new PrintStreamView(System.out)
+        );
     }
 }

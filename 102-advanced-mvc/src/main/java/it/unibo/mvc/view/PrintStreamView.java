@@ -63,7 +63,6 @@ public final class PrintStreamView implements DrawNumberView {
 
     @Override
     public void displayError(String message) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'displayError'");
+        out.println("Error: " + message);
     }
 }
